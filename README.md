@@ -139,7 +139,7 @@
       Based on info supplied, a 'scatter' trace seems appropriate.
       Read more about this trace type -> https://plot.ly/r/reference/#scatter
 
-![](/Users/rhangelxs/Desktop/Lab_R5/README_files/figure-markdown_strict/unnamed-chunk-7-1.png)
+![](README_files/figure-markdown_strict/unnamed-chunk-7-1.png)
 
 Убираем страшные выбросы в конце данных
 
@@ -149,14 +149,14 @@
       Based on info supplied, a 'scatter' trace seems appropriate.
       Read more about this trace type -> https://plot.ly/r/reference/#scatter
 
-![](/Users/rhangelxs/Desktop/Lab_R5/README_files/figure-markdown_strict/plotly-1.png)
+![](README_files/figure-markdown_strict/plotly-1.png)
 
     We recommend that you use the dev version of ggplot2 with `ggplotly()`
     Install it with: `devtools::install_github('hadley/ggplot2')`
 
     Don't know how to automatically pick scale for object of type labelled/integer. Defaulting to continuous.
 
-![](/Users/rhangelxs/Desktop/Lab_R5/README_files/figure-markdown_strict/unnamed-chunk-9-1.png)
+![](README_files/figure-markdown_strict/unnamed-chunk-9-1.png)
 
 Определение выбросов
 --------------------
@@ -200,7 +200,7 @@ Futher info is here: <https://jalobe.com/blog/tsoutliers/>
     5   LS 130  130   -6207 -4.75
     6   LS 158  158    4637  3.53
 
-![](/Users/rhangelxs/Desktop/Lab_R5/README_files/figure-markdown_strict/unnamed-chunk-12-1.png)
+![](README_files/figure-markdown_strict/unnamed-chunk-12-1.png)
 
                data       novostrojki novostrojki(usd) novostrojki(eur)
     2012-03-06 2012-03-06 125833      4296             3255            
@@ -253,7 +253,7 @@ Futher info is here: <https://jalobe.com/blog/tsoutliers/>
     2015-06-24                    3976   64 150808
     2016-08-24                    3205 <NA> 138273
 
-![](/Users/rhangelxs/Desktop/Lab_R5/README_files/figure-markdown_strict/unnamed-chunk-12-2.png)
+![](README_files/figure-markdown_strict/unnamed-chunk-12-2.png)
 
 ### Оптимальное разбиение
 
@@ -269,7 +269,7 @@ Futher info is here: <https://jalobe.com/blog/tsoutliers/>
     Corresponding to breakdates:
     70 95 129 
 
-![](/Users/rhangelxs/Desktop/Lab_R5/README_files/figure-markdown_strict/unnamed-chunk-14-1.png)
+![](README_files/figure-markdown_strict/unnamed-chunk-14-1.png)
 
 ### График с событиями и ценами
 
@@ -284,6 +284,6 @@ Futher info is here: <https://jalobe.com/blog/tsoutliers/>
 
     Don't know how to automatically pick scale for object of type labelled/integer. Defaulting to continuous.
 
-![](/Users/rhangelxs/Desktop/Lab_R5/README_files/figure-markdown_strict/unnamed-chunk-15-1.png)
+![](README_files/figure-markdown_strict/unnamed-chunk-15-1.png)
 
 To bee continued
