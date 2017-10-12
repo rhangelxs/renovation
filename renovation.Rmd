@@ -1,0 +1,461 @@
+---
+title: "Рынок недвижимости в Москве (реновация)"
+author: "Alexey Klimov"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    self_contained: no
+    toc: yes
+    toc_float:
+      collapsed: no
+      smooth_scroll: no
+  github_document:
+    toc: yes
+always_allow_html: yes
+#knit: (function(inputFile, encoding) { input.dir <- normalizePath(dirname(inputFile)); rmarkdown::render(input = inputFile, encoding = encoding, output_format="html_document", output_file = paste0(input.dir,'/',tools::file_path_sans_ext(inputFile),'.html')); rmarkdown::render(input = inputFile, encoding = encoding, output_format="md_document", output_file = paste0(input.dir,'/',tools::file_path_sans_ext(inputFile),'.md')); rmarkdown::render(input = inputFile, encoding = encoding, output_format="md_document", output_file = paste0(input.dir,'/README.md')) })
+knit: (function(inputFile, encoding) { input.dir <- normalizePath(dirname(inputFile)); rmarkdown::render(input = inputFile, encoding = encoding, output_format="html_document"); rmarkdown::render(input = inputFile, encoding = encoding, output_format="md_document"); rmarkdown::render(input = inputFile, encoding = encoding, output_format="md_document", output_file = paste0(input.dir,'/README.md')) })
+---
+
+# Загрузка нужных пакетов и хорошие настройки
+
+```{r setup}
+options(scipen = 10, digits = 2, OutDec = '.')
+knitr::opts_chunk$set(
+  cache = TRUE
+  , echo = FALSE
+  , autodep = TRUE
+  , encoding = "UTF-8"
+  , dpi = 96
+  , global.par = TRUE
+  , par = TRUE
+  , crop = TRUE
+  , comment = NA
+  , warning = FALSE
+  )
+```
+
+```{r}
+library(pander)
+library(tidyverse) # Наше все
+library(forcats) # Работа с факторными переменными
+library(reshape)
+```
+
+
+# Источники
+
+ * Информация по проекту реновации 
+ 
+Достоточно много информации есть на сайте РБК: https://realty.rbc.ru/news/577d16e89a7947e548ea49f3
+
+Там мы возьмем даты событий, чтобы именно около них искать всплески (часть лежит в `events.csv`).
+
+ * Change point analysis
+
+https://stats.stackexchange.com/questions/60245/penalty-value-in-changepoint-analysis/60440
+
+ * Granger causality interpretation using R
+
+https://stats.stackexchange.com/questions/131261/granger-causality-interpretation-using-r
+
+
+```{r, eval=FALSE}
+
+# Based on https://stackoverflow.com/questions/29348573/which-selector-to-write-in-rvest-package-in-r
+
+install.packages("rvest")
+library(rvest)
+url <- "http://www.restate.ru/graph/?id=1&sh=1&d=2&r1=1&o%5B%5D=1&o%5B%5D=2&curs%5B%5D=&curs%5B%5D=usd&curs%5B%5D=eur&period=1&relation=oil#gr1"
+
+page <- read_html(url)
+selector_name = "script:contains('google.visualization.arrayToDataTable')"
+script <- html_nodes(x = page, css = selector_name) %>% html_text()
+library(jsonlite)
+json_data <- gsub(x=script, pattern=".*google\\.visualization\\.arrayToDataTable\\((.*\\]\\])[\\);].*",replacement="\\1")
+library(tidyjson)
+
+json_data %>% gather_array %>% tail(-1)
+library(purrr)
+json_object <- json_data %>% jsonlite::fromJSON(simplifyVector=FALSE)
+```
+
+```{r, include=FALSE}
+
+save_url <- function(url, file_name = NULL) {
+  library(RSelenium)
+  library(wdman)
+  tryCatch({
+    pjs <- wdman::phantomjs()
+    
+    rD <- RSelenium::rsDriver(browser = "phantomjs", verbose = FALSE)
+    
+    remDrv <- rD[["client"]]
+    remDrv$navigate(url)
+    
+    page <- remDrv$getPageSource()[[1]]
+    
+    if (!is.null(file_name)) {
+      write(page, file = file_name)
+    } else {
+      return(page)
+    }
+  }, finally = {
+    pjs$output()
+    pjs$stop()
+  })
+}
+
+write <- function(x, file = "data", ...) {
+  dir.create(file.path(dirname(file)), showWarnings = FALSE, recursive = TRUE)
+  base::write(x = x, file = file, ...)
+}
+
+apply_function_to_column <- function(data, varname, func) {
+  library(lazyeval)
+  varval <- lazyeval::interp(~func(varname), varname = as.name(varname), func = func)
+  data <- data %>% mutate_(.dots = setNames(list(varval), varname))
+  return(data)
+}
+
+apply_function_to_columns <- function(data, columns, func) {
+  for (i in columns) {
+    data <- apply_function_to_column(data, varname = i, func = func)
+  }
+return(data)
+}
+
+remove_whitespace <- function(x) {
+  library(stringr)
+  # x <- str_replace_all(x, " ", "") # Bad - didn't strip non-breakable spaces
+  x <- str_replace_all(x, "[[:space:]]", "");
+  return(x)
+}
+```
+
+
+```{r}
+# Generate data
+moscow_url <- "http://www.restate.ru/graph/?id=1&sh=1&d=2&r1=2&o%5B%5D=1&o%5B%5D=2&o%5B%5D=3&curs%5B%5D=&curs%5B%5D=usd&curs%5B%5D=eur&period=1&relation=oil#gr1"
+moscow_filename <- "./data/raw_html/moscow.html"
+
+spb_url <- "http://www.restate.ru/graph/?id=1&sh=1&d=2&r1=1&o%5B%5D=1&o%5B%5D=2&o%5B%5D=3&curs%5B%5D=&curs%5B%5D=usd&curs%5B%5D=eur&period=1&relation=oil#gr1"
+spb_filename <- "./data/raw_html/spb.html"
+
+if (!file.exists(spb_filename)) write(save_url(spb_url), file = spb_filename)
+
+
+if (!file.exists(moscow_filename)) write(save_url(moscow_url), file = moscow_filename)
+
+```
+
+
+```{r data_load}
+
+
+
+prepare_data <- function(filename) {
+library(rvest)
+library(dplyr)  
+html_table <- html_node(x = read_html(filename), css = "div.chart table")
+realty_data <- html_table(html_table, fill = TRUE, dec = ",")    
+
+library(lubridate)
+realty_data <- realty_data %>% rowwise() %>% mutate(Дата = dmy(Дата))
+
+number_predictors <- c("Новостройки", "Новостройки (usd)", "Новостройки (eur)", "Вторичная", "Вторичная (usd)", "Вторичная (eur)", "Элитная недвижимость", "Элитная недвижимость (usd)", "Элитная недвижимость (eur)","Нефть")
+
+
+realty_data <- apply_function_to_columns(realty_data, columns = number_predictors, remove_whitespace)
+realty_data <- apply_function_to_columns(realty_data, columns = number_predictors, as.numeric)
+
+variable_names <- names(realty_data)
+
+library(stringi)
+variable_names %>% 
+  sapply(remove_whitespace) %>% 
+  stri_trans_tolower %>%
+  stri_trans_general("latin") %>% stri_trans_general("latin-ascii") %>% iconv(to = 'ASCII//TRANSLIT') %>%
+  str_replace_all("'","") -> sanitized_variable_names
+
+
+names(realty_data) <- sanitized_variable_names
+library(Hmisc)
+realty_data <- Hmisc::cleanup.import(realty_data)
+realty_data <- Hmisc::upData(realty_data, labels = setNames(variable_names, sanitized_variable_names), force.single = FALSE)
+attr(realty_data, "variable.labels") <- variable_names
+
+
+realty_data %>% select(novostrojki, vtoricnaa) %>% rowMeans -> realty_data$price
+
+
+return(realty_data)
+}
+
+realty_data <- prepare_data(moscow_filename)
+moscow_data <- prepare_data(moscow_filename)
+spb_data <- prepare_data(spb_filename)
+```
+
+# Что у нас в данных?
+
+## Разбивка по дням
+ 
+```{r}
+wday(realty_data$data, label=TRUE) %>%
+  fct_shift %>%
+  table %>% pander
+```
+
+## Разбивка по годам
+
+```{r}
+lubridate::year(realty_data$data) %>% table %>% pander
+```
+
+
+# Анализ
+
+## Цена в долларах США
+
+```{r}
+library(plotly)
+
+melt_data <- melt(realty_data %>% select(data, `novostrojki(usd)`, `vtoricnaa(usd)`) %>% as.data.frame, id.vars = "data")
+
+plotly::plot_ly(melt_data, x=~data, y=~value, color = ~variable, mode = "lines")
+
+```
+
+Убираем страшные выбросы в конце данных
+
+```{r}
+#realty_data <- realty_data %>% filter(price < 100000)
+#View(sapply(realty_data$Новостройки, remove_whitespace))
+#sapply(realty_data$Новостройки, remove_whitespace)
+realty_data %>% filter(`novostrojki(usd)` < 10000) -> realty_data #mutate_at(vars(contains("(usd)")), funs( if_else( is.na(.), NA, NA))) %>% #mutate_at(vars(contains("(eur)")), funs( if_else( is.na(.), NA, NA))) -> 
+melt_data <- melt(realty_data %>% select(data, `novostrojki(usd)`, `vtoricnaa(usd)`) %>% as.data.frame, id.vars = "data")
+
+```
+
+
+График рублевых цен на новостройки и вторичку:
+
+```{r plotly}
+melt_data_moscow <- melt(realty_data %>% select(data, novostrojki, vtoricnaa)  %>% as.data.frame, id.vars = "data")
+
+melt_data_spb <- melt(spb_data %>% select(data, novostrojki, vtoricnaa)  %>% as.data.frame, id.vars = "data")
+
+
+#plotly::plot_ly(realty_data, x=~data, y=~`price`)
+
+plotly::plot_ly(melt_data_moscow, x=~data, y=~value, color = ~variable, mode = "lines")
+```
+
+
+
+```{r}
+#devtools::install_github('cttobin/ggthemr')
+#library("ggthemr")
+#ggthemr_reset()
+#ggthemr('fresh')
+
+library(ggthemes)
+#theme_set(theme_few())
+#theme_set(scale_colour_few())
+
+#devtools::install_github('Ather-Energy/ggTimeSeries')
+#library(ggTimeSeries)
+g_p <- ggplot(melt_data) + aes(x=data, y=value, color=variable, group = variable) + geom_line()
+
+#g_p <- g_p + theme_hc() + scale_colour_hc()
+#g_p <- g_p + theme_few() + scale_colour_hc()
+
+ggplotly(g_p + scale_colour_hc())
+
+
+library(ggfortify)
+
+
+library(forecast)
+library(zoo)
+ts <- zoo(realty_data, order.by = as.Date(as.character(realty_data$data)))
+```
+
+```{r, eval=FALSE}
+decomp = stl(ts$price, s.window = "periodic")
+deseasonal_cnt <- seasadj(decomp)
+plot(decomp)
+```
+
+
+```{r, eval=FALSE}
+
+# base plot
+p1 = ggplot(dfData, aes(x = Time, y = Signal, group = VariableLabel, fill = VariableLabel)) +
+  stat_steamgraph()
+
+
+# adding some formatting
+p1 + 
+   xlab(NULL) + 
+   ylab(NULL) + 
+   coord_fixed( 0.2 * diff(range(dfData$Time)) / diff(range(dfData$Signal)))
+```
+
+## Определение выбросов
+
+### Классификация выбросов
+
+Five types of outliers can be considered.
+
+By default:
+
+* "AO" additive outliers,
+
+* "LS" level shifts,
+
+* "TC" temporary changes are selected;
+
+Manualy you can add:
+
+"IO" innovative outliers and "SLS" seasonal level shifts can also be selected
+
+Futher info is here: https://jalobe.com/blog/tsoutliers/
+
+```{r}
+
+#library(expsmooth)
+#library(fma)
+
+
+#1
+library(zoo)
+price <- zoo(realty_data$novostrojki, order.by = realty_data$data)
+
+#2
+library(xts)
+library(DT)
+price <- xts(realty_data$`novostrojki`, realty_data$data, unique = TRUE)
+
+
+# https://stats.stackexchange.com/questions/108374/arima-intervention-transfer-function-how-to-visualize-the-effect?rq=1
+
+#https://www.datascience.com/blog/introduction-to-forecasting-with-arima-in-r-learn-data-science-tutorials
+
+dat.ts <- ts(price, frequency = 1)
+
+cleaned <- forecast::tsclean(dat.ts[,1])
+
+library("tsoutliers")
+library(forecast)
+
+#dat.ts <- ts(price, deltat = 1/12)
+data.ts.outliers <- tso(dat.ts
+                        , types = c("AO","LS","TC")
+                        , maxit.iloop = 10
+                        , maxit.oloop = 10
+                        #, delta = 0.7
+                        #, cval = 3.5
+                        , tsmethod = "arima"
+                        #, xreg = spb_data$novostrojki
+                        )
+#data.ts.outliers <- tso(dat.ts, types = c("AO"))
+#data.ts.outliers <- tso(dat.ts, types = c("stsm"), maxit.iloop = 100)
+#data.ts.outliers <- tso(dat.ts,  maxit.iloop = 100, delta = 0.5, cval = 0.01, maxit.oloop = 10)
+data.ts.outliers
+plot(data.ts.outliers)
+
+#index <- data.ts.outliers$outliers %>% select(time) %>% c
+#realty_data %>% filter(data)
+
+# "%ni%" <- Negate("%in%")
+
+ts[data.ts.outliers$outliers$ind]
+cbind(data.ts.outliers$outliers, ts[data.ts.outliers$outliers$ind] %>% as.data.frame)
+plot(data.ts.outliers,
+  args.x.axis = list(at = time(data.ts.outliers$y), labels = realty_data$data)
+)
+
+```
+
+```{r}
+#price
+```
+
+### Оптимальное разбиение
+
+```{r}
+library("strucchange")
+breakpoints(dat.ts~1)
+
+ggplot2::autoplot(breakpoints(dat.ts~1), ts.colour = 'blue', ts.linetype = 'dashed',
+         cpt.colour = 'dodgerblue3', cpt.linetype = 'solid')
+```
+
+### График с событиями и ценами
+
+```{r}
+
+melt_data <- melt_data_moscow %>% filter(data > dmy("01-01-2017"))
+
+events <- read_csv2(file = "data/events.csv")
+
+events$ymin <- min(melt_data$value)
+events$ymax <- 0.1 * events$weigth * (max(melt_data$value) - min(melt_data$value)) + min(melt_data$value)
+events$date <- lubridate::dmy(events$date)
+g_p1 <- ggplot() + geom_line(mapping = aes(x=data, y=value, color=variable, group = variable)
+                            , data = melt_data %>% filter(data > dmy("01-01-2017"))
+                            ) + theme(legend.justification=c(0,1), legend.position=c(0,1))
+
+#g_p <- g_p + theme_hc() + scale_colour_hc()
+#g_p <- g_p + theme_few() + scale_colour_hc()
+
+#g_p <- g_p + scale_colour_hc()
+
+g_p2 <- ggplot() + geom_segment(data = events, mapping=aes(x=date, y=ymin, xend=date, yend=ymax)) +
+    geom_point(data = events, mapping=aes(x=date,y=ymax), size=2) +
+    geom_text(data = events, mapping=aes(x=date, y=ymax, label=description)
+              )
+
+gA <- ggplotGrob(g_p1)
+gB <- ggplotGrob(g_p2)
+maxWidth = grid::unit.pmax(gA$widths[2:3], gB$widths[2:3])
+gA$widths[2:3] <- maxWidth
+gB$widths[2:3] <- maxWidth
+
+
+AlignPlots <- function(...) {
+  library(gridExtra)
+  library(gtable)
+  LegendWidth <- function(x) x$grobs[[8]]$grobs[[1]]$widths[[4]]
+
+  plots.grobs <- lapply(list(...), ggplotGrob)
+
+  max.widths <- do.call(unit.pmax, lapply(plots.grobs, "[[", "widths"))
+  plots.grobs.eq.widths <- lapply(plots.grobs, function(x) {
+    x$widths <- max.widths
+    x
+  })
+
+  legends.widths <- lapply(plots.grobs, LegendWidth)
+  max.legends.width <- do.call(max, legends.widths)
+  plots.grobs.eq.widths.aligned <- lapply(plots.grobs.eq.widths, function(x) {
+    if (is.gtable(x$grobs[[8]])) {
+      x$grobs[[8]] <- gtable_add_cols(x$grobs[[8]],
+                                      unit(abs(diff(c(LegendWidth(x),
+                                                      max.legends.width))),
+                                           "mm"))
+    }
+    x
+  })
+
+  plots.grobs.eq.widths.aligned
+}
+grid::grid.newpage()
+
+library(gridExtra)
+gridExtra::grid.arrange(gA, gB)
+
+```
+
+To bee continued

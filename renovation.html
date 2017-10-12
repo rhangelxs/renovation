@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+<meta name="author" content="Alexey Klimov" />
+
+
+<title>Рынок недвижимости в Москве (реновация)</title>
+
+<script src="renovation_files/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="renovation_files/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="renovation_files/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="renovation_files/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="renovation_files/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="renovation_files/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="renovation_files/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="renovation_files/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="renovation_files/navigation-1.1/tabsets.js"></script>
+<link href="renovation_files/highlightjs-1.1/default.css" rel="stylesheet" />
+<script src="renovation_files/highlightjs-1.1/highlight.js"></script>
+<script src="renovation_files/htmlwidgets-0.8/htmlwidgets.js"></script>
+<script src="renovation_files/plotly-binding-4.7.0/plotly.js"></script>
+<script src="renovation_files/typedarray-0.1/typedarray.min.js"></script>
+<link href="renovation_files/crosstalk-1.0.0/css/crosstalk.css" rel="stylesheet" />
+<script src="renovation_files/crosstalk-1.0.0/js/crosstalk.min.js"></script>
+<link href="renovation_files/plotlyjs-1.27.1/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="renovation_files/plotlyjs-1.27.1/plotly-latest.min.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs && document.readyState && document.readyState === "complete") {
+   window.setTimeout(function() {
+      hljs.initHighlighting();
+   }, 0);
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = false;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+.tocify-subheader {
+  display: inline;
+}
+.tocify-subheader .tocify-item {
+  font-size: 0.95em;
+}
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Рынок недвижимости в Москве (реновация)</h1>
+<h4 class="author"><em>Alexey Klimov</em></h4>
+<h4 class="date"><em>12 октября, 2017</em></h4>
+
+</div>
+
+
+<div id="-----" class="section level1">
+<h1>Загрузка нужных пакетов и хорошие настройки</h1>
+<pre class="r"><code>options(scipen = 10, digits = 2, OutDec = &#39;.&#39;)
+knitr::opts_chunk$set(
+  cache = TRUE
+  , echo = FALSE
+  , autodep = TRUE
+  , encoding = &quot;UTF-8&quot;
+  , dpi = 96
+  , global.par = TRUE
+  , par = TRUE
+  , crop = TRUE
+  , comment = NA
+  , warning = FALSE
+  )</code></pre>
+</div>
+<div class="section level1">
+<h1>Источники</h1>
+<ul>
+<li>Информация по проекту реновации</li>
+</ul>
+<p>Достоточно много информации есть на сайте РБК: <a href="https://realty.rbc.ru/news/577d16e89a7947e548ea49f3" class="uri">https://realty.rbc.ru/news/577d16e89a7947e548ea49f3</a></p>
+<p>Там мы возьмем даты событий, чтобы именно около них искать всплески (часть лежит в <code>events.csv</code>).</p>
+<ul>
+<li>Change point analysis</li>
+</ul>
+<p><a href="https://stats.stackexchange.com/questions/60245/penalty-value-in-changepoint-analysis/60440" class="uri">https://stats.stackexchange.com/questions/60245/penalty-value-in-changepoint-analysis/60440</a></p>
+<ul>
+<li>Granger causality interpretation using R</li>
+</ul>
+<p><a href="https://stats.stackexchange.com/questions/131261/granger-causality-interpretation-using-r" class="uri">https://stats.stackexchange.com/questions/131261/granger-causality-interpretation-using-r</a></p>
+<pre><code>Input object size:   11272 bytes;    11 variables    172 observations
+New object size:    16624 bytes;    11 variables    172 observations</code></pre>
+<pre><code>Input object size:   11272 bytes;    11 variables    172 observations
+New object size:    16624 bytes;    11 variables    172 observations</code></pre>
+<pre><code>Input object size:   11272 bytes;    11 variables    172 observations
+New object size:    16624 bytes;    11 variables    172 observations</code></pre>
+</div>
+<div id="----" class="section level1">
+<h1>Что у нас в данных?</h1>
+<div id="--" class="section level2">
+<h2>Разбивка по дням</h2>
+<table style="width:62%;">
+<colgroup>
+<col width="8%" />
+<col width="9%" />
+<col width="8%" />
+<col width="11%" />
+<col width="8%" />
+<col width="8%" />
+<col width="8%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">Mon</th>
+<th align="center">Tues</th>
+<th align="center">Wed</th>
+<th align="center">Thurs</th>
+<th align="center">Fri</th>
+<th align="center">Sat</th>
+<th align="center">Sun</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">8</td>
+<td align="center">74</td>
+<td align="center">67</td>
+<td align="center">17</td>
+<td align="center">6</td>
+<td align="center">0</td>
+<td align="center">0</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="--" class="section level2">
+<h2>Разбивка по годам</h2>
+<table style="width:97%;">
+<colgroup>
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">2008</th>
+<th align="center">2009</th>
+<th align="center">2010</th>
+<th align="center">2011</th>
+<th align="center">2012</th>
+<th align="center">2013</th>
+<th align="center">2014</th>
+<th align="center">2015</th>
+<th align="center">2016</th>
+<th align="center">2017</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">7</td>
+<td align="center">25</td>
+<td align="center">24</td>
+<td align="center">21</td>
+<td align="center">18</td>
+<td align="center">11</td>
+<td align="center">12</td>
+<td align="center">23</td>
+<td align="center">24</td>
+<td align="center">7</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section level1">
+<h1>Анализ</h1>
+<div id="---" class="section level2">
+<h2>Цена в долларах США</h2>
+<pre><code>No trace type specified:
+  Based on info supplied, a &#39;scatter&#39; trace seems appropriate.
+  Read more about this trace type -&gt; https://plot.ly/r/reference/#scatter</code></pre>
+<div id="20c775f72d5d" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="20c775f72d5d">{"x":{"visdat":{"20c722f6c0f9":["function () ","plotlyVisDat"]},"cur_data":"20c722f6c0f9","attrs":{"20c722f6c0f9":{"x":{},"y":{},"mode":"lines","color":{},"alpha":1,"sizes":[10,100]}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"xaxis":{"domain":[0,1],"title":"data"},"yaxis":{"domain":[0,1],"title":"value"},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":[{"name":"Collaborate","icon":{"width":1000,"ascent":500,"descent":-50,"path":"M487 375c7-10 9-23 5-36l-79-259c-3-12-11-23-22-31-11-8-22-12-35-12l-263 0c-15 0-29 5-43 15-13 10-23 23-28 37-5 13-5 25-1 37 0 0 0 3 1 7 1 5 1 8 1 11 0 2 0 4-1 6 0 3-1 5-1 6 1 2 2 4 3 6 1 2 2 4 4 6 2 3 4 5 5 7 5 7 9 16 13 26 4 10 7 19 9 26 0 2 0 5 0 9-1 4-1 6 0 8 0 2 2 5 4 8 3 3 5 5 5 7 4 6 8 15 12 26 4 11 7 19 7 26 1 1 0 4 0 9-1 4-1 7 0 8 1 2 3 5 6 8 4 4 6 6 6 7 4 5 8 13 13 24 4 11 7 20 7 28 1 1 0 4 0 7-1 3-1 6-1 7 0 2 1 4 3 6 1 1 3 4 5 6 2 3 3 5 5 6 1 2 3 5 4 9 2 3 3 7 5 10 1 3 2 6 4 10 2 4 4 7 6 9 2 3 4 5 7 7 3 2 7 3 11 3 3 0 8 0 13-1l0-1c7 2 12 2 14 2l218 0c14 0 25-5 32-16 8-10 10-23 6-37l-79-259c-7-22-13-37-20-43-7-7-19-10-37-10l-248 0c-5 0-9-2-11-5-2-3-2-7 0-12 4-13 18-20 41-20l264 0c5 0 10 2 16 5 5 3 8 6 10 11l85 282c2 5 2 10 2 17 7-3 13-7 17-13z m-304 0c-1-3-1-5 0-7 1-1 3-2 6-2l174 0c2 0 4 1 7 2 2 2 4 4 5 7l6 18c0 3 0 5-1 7-1 1-3 2-6 2l-173 0c-3 0-5-1-8-2-2-2-4-4-4-7z m-24-73c-1-3-1-5 0-7 2-2 3-2 6-2l174 0c2 0 5 0 7 2 3 2 4 4 5 7l6 18c1 2 0 5-1 6-1 2-3 3-5 3l-174 0c-3 0-5-1-7-3-3-1-4-4-5-6z"},"click":"function(gd) { \n        // is this being viewed in RStudio?\n        if (location.search == '?viewer_pane=1') {\n          alert('To learn about plotly for collaboration, visit:\\n https://cpsievert.github.io/plotly_book/plot-ly-for-collaboration.html');\n        } else {\n          window.open('https://cpsievert.github.io/plotly_book/plot-ly-for-collaboration.html', '_blank');\n        }\n      }"}],"cloud":false},"data":[{"x":["2008-10-22","2008-10-22","2008-11-05","2008-11-19","2008-12-03","2008-12-17","2008-12-31","2009-01-14","2009-01-27","2009-02-10","2009-02-24","2009-03-11","2009-03-25","2009-04-08","2009-04-21","2009-05-08","2009-05-26","2009-06-09","2009-06-22","2009-07-07","2009-07-21","2009-08-03","2009-08-19","2009-08-31","2009-09-15","2009-09-29","2009-10-13","2009-10-27","2009-11-10","2009-11-24","2009-12-08","2009-12-22","2010-01-19","2010-02-02","2010-02-17","2010-03-02","2010-03-16","2010-03-30","2010-04-13","2010-04-27","2010-05-12","2010-05-26","2010-06-09","2010-06-23","2010-07-07","2010-07-19","2010-08-04","2010-08-24","2010-09-21","2010-09-30","2010-10-12","2010-10-26","2010-11-09","2010-11-23","2010-12-08","2010-12-20","2011-01-11","2011-01-25","2011-02-08","2011-02-22","2011-03-22","2011-04-04","2011-04-19","2011-05-17","2011-05-31","2011-06-28","2011-07-12","2011-07-27","2011-08-23","2011-09-12","2011-10-05","2011-10-11","2011-11-02","2011-11-18","2011-12-05","2011-12-13","2011-12-27","2012-01-19","2012-02-01","2012-02-21","2012-03-06","2012-04-03","2012-04-18","2012-05-03","2012-05-15","2012-05-29","2012-06-14","2012-06-26","2012-07-11","2012-07-25","2012-08-07","2012-09-04","2012-10-02","2012-11-07","2012-12-04","2013-01-29","2013-03-06","2013-04-02","2013-05-07","2013-06-04","2013-07-02","2013-08-06","2013-09-03","2013-10-01","2013-11-05","2013-12-03","2014-01-14","2014-02-05","2014-03-04","2014-04-01","2014-05-06","2014-06-03","2014-07-01","2014-08-05","2014-09-02","2014-10-03","2014-11-07","2014-12-02","2015-01-13","2015-02-03","2015-02-20","2015-03-05","2015-03-18","2015-04-01","2015-04-15","2015-04-29","2015-05-13","2015-05-27","2015-06-10","2015-06-24","2015-07-08","2015-07-23","2015-08-05","2015-08-19","2015-09-02","2015-09-16","2015-10-01","2015-10-14","2015-10-28","2015-11-11","2015-11-26","2016-01-14","2016-01-27","2016-02-10","2016-02-25","2016-03-09","2016-03-23","2016-04-06","2016-04-20","2016-05-05","2016-05-19","2016-06-01","2016-06-15","2016-06-29","2016-07-13","2016-07-27","2016-08-10","2016-08-24","2016-09-21","2016-10-06","2016-10-26","2016-11-09","2016-11-23","2016-12-07","2016-12-22","2017-01-25","2017-02-08","2017-02-23","2017-03-30","2017-04-13","2017-04-28","2017-05-10"],"y":[3763,3751,3597,3501,3355,3374,3190,2987,2826,2567,2604,2622,2740,2751,2703,2766,2899,2912,2872,2869,2907,2881,2902,3004,3012,3112,3155,3255,3277,3244,3114,2984,3063,2975,3035,3097,3164,3143,3282,3274,3151,3052,3005,3075,3050,3137,3146,3115,3091,3164,3284,3237,3191,3190,3171,3309,3285,3231,3276,3326,3408,3391,3362,3380,3414,3410,3445,3536,3391,3085,3133,3287,3602,3646,3620,3644,3707,3724,3937,4036,4296,4199,4083,4094,4022,3725,3579,3628,3665,3717,3891,3874,3993,4212,4479,4825,4873,4744,4802,4687,4653,4649,4640,4627,4629,4686,4741,4463,4406,4597,4626,4777,4927,4630,4432,4222,3718,3286,2697,2414,2699,2674,2607,2774,3056,3012,3070,3039,2737,2691,2492,2515,2306,2201,2198,2087,2096,2230,2207,2171,2139,1795,1684,1764,1834,1896,1995,1971,2067,1989,2022,2006,1988,2001,2021,1971,1990,2049,2061,2102,2100,2016,1960,1918,2000,2086,2120,2147,2203,2199,2187,125953],"mode":"lines","type":"scatter","name":"novostrojki(usd)","line":{"fillcolor":"rgba(102,194,165,0.5)","color":"rgba(102,194,165,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":["2008-10-22","2008-10-22","2008-11-05","2008-11-19","2008-12-03","2008-12-17","2008-12-31","2009-01-14","2009-01-27","2009-02-10","2009-02-24","2009-03-11","2009-03-25","2009-04-08","2009-04-21","2009-05-08","2009-05-26","2009-06-09","2009-06-22","2009-07-07","2009-07-21","2009-08-03","2009-08-19","2009-08-31","2009-09-15","2009-09-29","2009-10-13","2009-10-27","2009-11-10","2009-11-24","2009-12-08","2009-12-22","2010-01-19","2010-02-02","2010-02-17","2010-03-02","2010-03-16","2010-03-30","2010-04-13","2010-04-27","2010-05-12","2010-05-26","2010-06-09","2010-06-23","2010-07-07","2010-07-19","2010-08-04","2010-08-24","2010-09-21","2010-09-30","2010-10-12","2010-10-26","2010-11-09","2010-11-23","2010-12-08","2010-12-20","2011-01-11","2011-01-25","2011-02-08","2011-02-22","2011-03-22","2011-04-04","2011-04-19","2011-05-17","2011-05-31","2011-06-28","2011-07-12","2011-07-27","2011-08-23","2011-09-12","2011-10-05","2011-10-11","2011-11-02","2011-11-18","2011-12-05","2011-12-13","2011-12-27","2012-01-19","2012-02-01","2012-02-21","2012-03-06","2012-04-03","2012-04-18","2012-05-03","2012-05-15","2012-05-29","2012-06-14","2012-06-26","2012-07-11","2012-07-25","2012-08-07","2012-09-04","2012-10-02","2012-11-07","2012-12-04","2013-01-29","2013-03-06","2013-04-02","2013-05-07","2013-06-04","2013-07-02","2013-08-06","2013-09-03","2013-10-01","2013-11-05","2013-12-03","2014-01-14","2014-02-05","2014-03-04","2014-04-01","2014-05-06","2014-06-03","2014-07-01","2014-08-05","2014-09-02","2014-10-03","2014-11-07","2014-12-02","2015-01-13","2015-02-03","2015-02-20","2015-03-05","2015-03-18","2015-04-01","2015-04-15","2015-04-29","2015-05-13","2015-05-27","2015-06-10","2015-06-24","2015-07-08","2015-07-23","2015-08-05","2015-08-19","2015-09-02","2015-09-16","2015-10-01","2015-10-14","2015-10-28","2015-11-11","2015-11-26","2016-01-14","2016-01-27","2016-02-10","2016-02-25","2016-03-09","2016-03-23","2016-04-06","2016-04-20","2016-05-05","2016-05-19","2016-06-01","2016-06-15","2016-06-29","2016-07-13","2016-07-27","2016-08-10","2016-08-24","2016-09-21","2016-10-06","2016-10-26","2016-11-09","2016-11-23","2016-12-07","2016-12-22","2017-01-25","2017-02-08","2017-02-23","2017-03-30","2017-04-13","2017-04-28","2017-05-10"],"y":[4364,4745,4530,4594,4501,4340,4021,3743,3581,3265,3353,3284,3521,3304,3274,3317,3453,3407,3320,3664,3523,3444,3475,3476,3451,3515,3576,3682,3732,3731,3607,3468,3633,3464,3533,3569,3627,3566,3630,3570,3448,3273,3305,3363,3331,3482,3510,3432,3402,3459,3515,3467,3289,3351,3267,3514,3489,3551,3599,3588,3707,3693,3827,3909,3968,3892,3867,4018,3974,3826,3916,4041,4285,4271,4177,4269,4543,4497,4658,4839,4895,4775,4784,4851,4729,4473,4237,4474,4433,4554,4699,4753,4936,4918,5067,5234,5142,4926,4925,4576,4494,4635,4551,4803,4581,4598,4641,4341,4240,4358,4369,4545,4735,4491,4261,4049,3576,3129,2626,2382,2658,2674,2642,2775,3062,3023,3127,3156,2832,2874,2643,2652,2399,2285,2271,2184,2253,2373,2318,2282,2271,1895,1752,1842,1899,1976,2122,2089,2193,2217,2279,2193,2220,2267,2229,2164,2192,2220,2292,2360,2358,2277,2238,2161,2243,2364,2424,2584,2661,2688,2655,150176],"mode":"lines","type":"scatter","name":"vtoricnaa(usd)","line":{"fillcolor":"rgba(141,160,203,0.5)","color":"rgba(141,160,203,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1}},"base_url":"https://plot.ly"},"evals":["config.modeBarButtonsToAdd.0.click"],"jsHooks":{"render":[{"code":"function(el, x) { var ctConfig = crosstalk.var('plotlyCrosstalkOpts').set({\"on\":\"plotly_click\",\"persistent\":false,\"dynamic\":false,\"selectize\":false,\"opacityDim\":0.2,\"selected\":{\"opacity\":1}}); }","data":null}]}}</script>
+<p>Убираем страшные выбросы в конце данных</p>
+<p>График рублевых цен на новостройки и вторичку:</p>
+<pre><code>No trace type specified:
+  Based on info supplied, a &#39;scatter&#39; trace seems appropriate.
+  Read more about this trace type -&gt; https://plot.ly/r/reference/#scatter</code></pre>
+<div id="20c73a1591e5" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="20c73a1591e5">{"x":{"visdat":{"20c77bbf05cb":["function () ","plotlyVisDat"]},"cur_data":"20c77bbf05cb","attrs":{"20c77bbf05cb":{"x":{},"y":{},"mode":"lines","color":{},"alpha":1,"sizes":[10,100]}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"xaxis":{"domain":[0,1],"title":"data"},"yaxis":{"domain":[0,1],"title":"value"},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":[{"name":"Collaborate","icon":{"width":1000,"ascent":500,"descent":-50,"path":"M487 375c7-10 9-23 5-36l-79-259c-3-12-11-23-22-31-11-8-22-12-35-12l-263 0c-15 0-29 5-43 15-13 10-23 23-28 37-5 13-5 25-1 37 0 0 0 3 1 7 1 5 1 8 1 11 0 2 0 4-1 6 0 3-1 5-1 6 1 2 2 4 3 6 1 2 2 4 4 6 2 3 4 5 5 7 5 7 9 16 13 26 4 10 7 19 9 26 0 2 0 5 0 9-1 4-1 6 0 8 0 2 2 5 4 8 3 3 5 5 5 7 4 6 8 15 12 26 4 11 7 19 7 26 1 1 0 4 0 9-1 4-1 7 0 8 1 2 3 5 6 8 4 4 6 6 6 7 4 5 8 13 13 24 4 11 7 20 7 28 1 1 0 4 0 7-1 3-1 6-1 7 0 2 1 4 3 6 1 1 3 4 5 6 2 3 3 5 5 6 1 2 3 5 4 9 2 3 3 7 5 10 1 3 2 6 4 10 2 4 4 7 6 9 2 3 4 5 7 7 3 2 7 3 11 3 3 0 8 0 13-1l0-1c7 2 12 2 14 2l218 0c14 0 25-5 32-16 8-10 10-23 6-37l-79-259c-7-22-13-37-20-43-7-7-19-10-37-10l-248 0c-5 0-9-2-11-5-2-3-2-7 0-12 4-13 18-20 41-20l264 0c5 0 10 2 16 5 5 3 8 6 10 11l85 282c2 5 2 10 2 17 7-3 13-7 17-13z m-304 0c-1-3-1-5 0-7 1-1 3-2 6-2l174 0c2 0 4 1 7 2 2 2 4 4 5 7l6 18c0 3 0 5-1 7-1 1-3 2-6 2l-173 0c-3 0-5-1-8-2-2-2-4-4-4-7z m-24-73c-1-3-1-5 0-7 2-2 3-2 6-2l174 0c2 0 5 0 7 2 3 2 4 4 5 7l6 18c1 2 0 5-1 6-1 2-3 3-5 3l-174 0c-3 0-5-1-7-3-3-1-4-4-5-6z"},"click":"function(gd) { \n        // is this being viewed in RStudio?\n        if (location.search == '?viewer_pane=1') {\n          alert('To learn about plotly for collaboration, visit:\\n https://cpsievert.github.io/plotly_book/plot-ly-for-collaboration.html');\n        } else {\n          window.open('https://cpsievert.github.io/plotly_book/plot-ly-for-collaboration.html', '_blank');\n        }\n      }"}],"cloud":false},"data":[{"x":["2008-10-22","2008-10-22","2008-11-05","2008-11-19","2008-12-03","2008-12-17","2008-12-31","2009-01-14","2009-01-27","2009-02-10","2009-02-24","2009-03-11","2009-03-25","2009-04-08","2009-04-21","2009-05-08","2009-05-26","2009-06-09","2009-06-22","2009-07-07","2009-07-21","2009-08-03","2009-08-19","2009-08-31","2009-09-15","2009-09-29","2009-10-13","2009-10-27","2009-11-10","2009-11-24","2009-12-08","2009-12-22","2010-01-19","2010-02-02","2010-02-17","2010-03-02","2010-03-16","2010-03-30","2010-04-13","2010-04-27","2010-05-12","2010-05-26","2010-06-09","2010-06-23","2010-07-07","2010-07-19","2010-08-04","2010-08-24","2010-09-21","2010-09-30","2010-10-12","2010-10-26","2010-11-09","2010-11-23","2010-12-08","2010-12-20","2011-01-11","2011-01-25","2011-02-08","2011-02-22","2011-03-22","2011-04-04","2011-04-19","2011-05-17","2011-05-31","2011-06-28","2011-07-12","2011-07-27","2011-08-23","2011-09-12","2011-10-05","2011-10-11","2011-11-02","2011-11-18","2011-12-05","2011-12-13","2011-12-27","2012-01-19","2012-02-01","2012-02-21","2012-03-06","2012-04-03","2012-04-18","2012-05-03","2012-05-15","2012-05-29","2012-06-14","2012-06-26","2012-07-11","2012-07-25","2012-08-07","2012-09-04","2012-10-02","2012-11-07","2012-12-04","2013-01-29","2013-03-06","2013-04-02","2013-05-07","2013-06-04","2013-07-02","2013-08-06","2013-09-03","2013-10-01","2013-11-05","2013-12-03","2014-01-14","2014-02-05","2014-03-04","2014-04-01","2014-05-06","2014-06-03","2014-07-01","2014-08-05","2014-09-02","2014-10-03","2014-11-07","2014-12-02","2015-01-13","2015-02-03","2015-02-20","2015-03-05","2015-03-18","2015-04-01","2015-04-15","2015-04-29","2015-05-13","2015-05-27","2015-06-10","2015-06-24","2015-07-08","2015-07-23","2015-08-05","2015-08-19","2015-09-02","2015-09-16","2015-10-01","2015-10-14","2015-10-28","2015-11-11","2015-11-26","2016-01-14","2016-01-27","2016-02-10","2016-02-25","2016-03-09","2016-03-23","2016-04-06","2016-04-20","2016-05-05","2016-05-19","2016-06-01","2016-06-15","2016-06-29","2016-07-13","2016-07-27","2016-08-10","2016-08-24","2016-09-21","2016-10-06","2016-10-26","2016-11-09","2016-11-23","2016-12-07","2016-12-22","2017-01-25","2017-02-08","2017-02-23","2017-03-30","2017-04-13","2017-04-28"],"y":[99487,99186,98677,96027,93985,93118,93709,93272,92973,92735,92306,92964,91175,91845,90656,90688,90020,90506,90231,90120,91190,91958,92621,92713,92953,93982,93374,94199,94527,93413,91921,91179,90663,90433,91393,92681,92813,93144,94995,95235,95681,95909,95003,95001,94903,94003,94293,95322,95772,96184,97966,97836,98287,98877,98998,98785,98077,96452,96226,96981,96688,95503,94699,95059,95837,96670,96757,97415,99209,100826,102381,105205,110374,112040,113711,114458,115753,117464,119330,120208,125833,123232,120996,120248,121720,118547,117166,120349,120868,121308,124308,125593,124788,132745,138104,145139,146202,147575,149269,150224,152858,152876,154280,150295,153456,155347,157026,158203,160282,163684,165785,166660,166753,165112,165272,166988,168009,170252,169192,168166,167712,165474,160977,159926,158846,157559,156315,152911,153011,145847,142566,143397,145098,144875,143620,140132,137793,138762,140140,139820,140046,137193,137793,138814,140073,137208,135221,135754,135676,131630,131549,132379,131272,129710,129136,129592,128936,132733,133441,131301,130325,128503,124696,122517,122229,123540,125515,123414,125618,124821,124596],"mode":"lines","type":"scatter","name":"novostrojki","line":{"fillcolor":"rgba(102,194,165,0.5)","color":"rgba(102,194,165,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":["2008-10-22","2008-10-22","2008-11-05","2008-11-19","2008-12-03","2008-12-17","2008-12-31","2009-01-14","2009-01-27","2009-02-10","2009-02-24","2009-03-11","2009-03-25","2009-04-08","2009-04-21","2009-05-08","2009-05-26","2009-06-09","2009-06-22","2009-07-07","2009-07-21","2009-08-03","2009-08-19","2009-08-31","2009-09-15","2009-09-29","2009-10-13","2009-10-27","2009-11-10","2009-11-24","2009-12-08","2009-12-22","2010-01-19","2010-02-02","2010-02-17","2010-03-02","2010-03-16","2010-03-30","2010-04-13","2010-04-27","2010-05-12","2010-05-26","2010-06-09","2010-06-23","2010-07-07","2010-07-19","2010-08-04","2010-08-24","2010-09-21","2010-09-30","2010-10-12","2010-10-26","2010-11-09","2010-11-23","2010-12-08","2010-12-20","2011-01-11","2011-01-25","2011-02-08","2011-02-22","2011-03-22","2011-04-04","2011-04-19","2011-05-17","2011-05-31","2011-06-28","2011-07-12","2011-07-27","2011-08-23","2011-09-12","2011-10-05","2011-10-11","2011-11-02","2011-11-18","2011-12-05","2011-12-13","2011-12-27","2012-01-19","2012-02-01","2012-02-21","2012-03-06","2012-04-03","2012-04-18","2012-05-03","2012-05-15","2012-05-29","2012-06-14","2012-06-26","2012-07-11","2012-07-25","2012-08-07","2012-09-04","2012-10-02","2012-11-07","2012-12-04","2013-01-29","2013-03-06","2013-04-02","2013-05-07","2013-06-04","2013-07-02","2013-08-06","2013-09-03","2013-10-01","2013-11-05","2013-12-03","2014-01-14","2014-02-05","2014-03-04","2014-04-01","2014-05-06","2014-06-03","2014-07-01","2014-08-05","2014-09-02","2014-10-03","2014-11-07","2014-12-02","2015-01-13","2015-02-03","2015-02-20","2015-03-05","2015-03-18","2015-04-01","2015-04-15","2015-04-29","2015-05-13","2015-05-27","2015-06-10","2015-06-24","2015-07-08","2015-07-23","2015-08-05","2015-08-19","2015-09-02","2015-09-16","2015-10-01","2015-10-14","2015-10-28","2015-11-11","2015-11-26","2016-01-14","2016-01-27","2016-02-10","2016-02-25","2016-03-09","2016-03-23","2016-04-06","2016-04-20","2016-05-05","2016-05-19","2016-06-01","2016-06-15","2016-06-29","2016-07-13","2016-07-27","2016-08-10","2016-08-24","2016-09-21","2016-10-06","2016-10-26","2016-11-09","2016-11-23","2016-12-07","2016-12-22","2017-01-25","2017-02-08","2017-02-23","2017-03-30","2017-04-13","2017-04-28"],"y":[115380,125471,124261,126007,126110,119776,118140,116874,117830,117942,118858,116441,117169,110285,109802,108758,107234,105866,104294,115106,110519,109920,110907,107280,106493,106136,105828,106560,107673,107457,106496,105971,107536,105311,106405,106827,106402,105673,105069,103839,104677,102868,104493,103910,103628,104359,105174,105025,105394,105157,104868,104788,101303,103859,102021,104901,104148,106013,105706,104602,105154,104004,107787,109925,111382,110319,108598,110690,116262,125020,127976,129343,131307,131263,131202,134103,141862,141848,141196,144106,143368,140135,141790,142464,143139,142355,138690,148405,146182,148624,150125,154065,154272,155004,156238,157440,154267,153239,153074,146661,147631,152396,151326,156022,151862,152429,153712,153889,154250,155178,156568,158584,160252,160153,158901,160141,161568,162094,164721,165912,165117,165475,163173,159978,159135,158090,159226,158813,158359,155770,151231,151244,150948,150451,148436,146653,148127,147654,147180,146959,148728,144823,143375,144920,145035,143028,143845,143943,143943,146714,148256,144714,146572,146914,142435,142246,141984,143813,148395,147398,146285,145143,142393,138057,137065,139990,143471,148510,151753,152551,151277],"mode":"lines","type":"scatter","name":"vtoricnaa","line":{"fillcolor":"rgba(141,160,203,0.5)","color":"rgba(141,160,203,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1}},"base_url":"https://plot.ly"},"evals":["config.modeBarButtonsToAdd.0.click"],"jsHooks":{"render":[{"code":"function(el, x) { var ctConfig = crosstalk.var('plotlyCrosstalkOpts').set({\"on\":\"plotly_click\",\"persistent\":false,\"dynamic\":false,\"selectize\":false,\"opacityDim\":0.2,\"selected\":{\"opacity\":1}}); }","data":null}]}}</script>
+<pre><code>We recommend that you use the dev version of ggplot2 with `ggplotly()`
+Install it with: `devtools::install_github(&#39;hadley/ggplot2&#39;)`</code></pre>
+<pre><code>Don&#39;t know how to automatically pick scale for object of type labelled/integer. Defaulting to continuous.</code></pre>
+<div id="20c73354a7b8" style="width:504px;height:360px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="20c73354a7b8">{"x":{"data":[{"x":[1224633600000,1224633600000,1225843200000,1227052800000,1228262400000,1229472000000,1230681600000,1231891200000,1233014400000,1234224000000,1235433600000,1236729600000,1237939200000,1239148800000,1240272000000,1241740800000,1243296000000,1244505600000,1245628800000,1246924800000,1248134400000,1249257600000,1250640000000,1251676800000,1252972800000,1254182400000,1255392000000,1256601600000,1257811200000,1259020800000,1260230400000,1261440000000,1263859200000,1265068800000,1266364800000,1267488000000,1268697600000,1269907200000,1271116800000,1272326400000,1273622400000,1274832000000,1276041600000,1277251200000,1278460800000,1279497600000,1280880000000,1282608000000,1285027200000,1285804800000,1286841600000,1288051200000,1289260800000,1290470400000,1291766400000,1292803200000,1294704000000,1295913600000,1297123200000,1298332800000,1300752000000,1301875200000,1303171200000,1305590400000,1306800000000,1309219200000,1310428800000,1311724800000,1314057600000,1315785600000,1317772800000,1318291200000,1320192000000,1321574400000,1323043200000,1323734400000,1324944000000,1326931200000,1328054400000,1329782400000,1330992000000,1333411200000,1334707200000,1336003200000,1337040000000,1338249600000,1339632000000,1340668800000,1341964800000,1343174400000,1344297600000,1346716800000,1349136000000,1352246400000,1354579200000,1359417600000,1362528000000,1364860800000,1367884800000,1370304000000,1372723200000,1375747200000,1378166400000,1380585600000,1383609600000,1386028800000,1389657600000,1391558400000,1393891200000,1396310400000,1399334400000,1401753600000,1404172800000,1407196800000,1409616000000,1412294400000,1415318400000,1417478400000,1421107200000,1422921600000,1424390400000,1425513600000,1426636800000,1427846400000,1429056000000,1430265600000,1431475200000,1432684800000,1433894400000,1435104000000,1436313600000,1437609600000,1438732800000,1439942400000,1441152000000,1442361600000,1443657600000,1444780800000,1445990400000,1447200000000,1448496000000,1452729600000,1453852800000,1455062400000,1456358400000,1457481600000,1458691200000,1459900800000,1461110400000,1462406400000,1463616000000,1464739200000,1465948800000,1467158400000,1468368000000,1469577600000,1470787200000,1471996800000,1474416000000,1475712000000,1477440000000,1478649600000,1479859200000,1481068800000,1482364800000,1485302400000,1486512000000,1487808000000,1490832000000,1492041600000,1493337600000],"y":[3763,3751,3597,3501,3355,3374,3190,2987,2826,2567,2604,2622,2740,2751,2703,2766,2899,2912,2872,2869,2907,2881,2902,3004,3012,3112,3155,3255,3277,3244,3114,2984,3063,2975,3035,3097,3164,3143,3282,3274,3151,3052,3005,3075,3050,3137,3146,3115,3091,3164,3284,3237,3191,3190,3171,3309,3285,3231,3276,3326,3408,3391,3362,3380,3414,3410,3445,3536,3391,3085,3133,3287,3602,3646,3620,3644,3707,3724,3937,4036,4296,4199,4083,4094,4022,3725,3579,3628,3665,3717,3891,3874,3993,4212,4479,4825,4873,4744,4802,4687,4653,4649,4640,4627,4629,4686,4741,4463,4406,4597,4626,4777,4927,4630,4432,4222,3718,3286,2697,2414,2699,2674,2607,2774,3056,3012,3070,3039,2737,2691,2492,2515,2306,2201,2198,2087,2096,2230,2207,2171,2139,1795,1684,1764,1834,1896,1995,1971,2067,1989,2022,2006,1988,2001,2021,1971,1990,2049,2061,2102,2100,2016,1960,1918,2000,2086,2120,2147,2203,2199,2187],"text":["data: 14174<br />value: 3763<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14174<br />value: 3751<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14188<br />value: 3597<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14202<br />value: 3501<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14216<br />value: 3355<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14230<br />value: 3374<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14244<br />value: 3190<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14258<br />value: 2987<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14271<br />value: 2826<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14285<br />value: 2567<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14299<br />value: 2604<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14314<br />value: 2622<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14328<br />value: 2740<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14342<br />value: 2751<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14355<br />value: 2703<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14372<br />value: 2766<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14390<br />value: 2899<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14404<br />value: 2912<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14417<br />value: 2872<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14432<br />value: 2869<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14446<br />value: 2907<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14459<br />value: 2881<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14475<br />value: 2902<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14487<br />value: 3004<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14502<br />value: 3012<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14516<br />value: 3112<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14530<br />value: 3155<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14544<br />value: 3255<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14558<br />value: 3277<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14572<br />value: 3244<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14586<br />value: 3114<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14600<br />value: 2984<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14628<br />value: 3063<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14642<br />value: 2975<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14657<br />value: 3035<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14670<br />value: 3097<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14684<br />value: 3164<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14698<br />value: 3143<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14712<br />value: 3282<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14726<br />value: 3274<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14741<br />value: 3151<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14755<br />value: 3052<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14769<br />value: 3005<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14783<br />value: 3075<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14797<br />value: 3050<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14809<br />value: 3137<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14825<br />value: 3146<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14845<br />value: 3115<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14873<br />value: 3091<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14882<br />value: 3164<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14894<br />value: 3284<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14908<br />value: 3237<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14922<br />value: 3191<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14936<br />value: 3190<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14951<br />value: 3171<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14963<br />value: 3309<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14985<br />value: 3285<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 14999<br />value: 3231<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 15013<br />value: 3276<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 15027<br />value: 3326<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 15055<br />value: 3408<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 15068<br />value: 3391<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 15083<br />value: 3362<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 15111<br />value: 3380<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 15125<br />value: 3414<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 15153<br />value: 3410<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 15167<br />value: 3445<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 15182<br />value: 3536<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 15209<br />value: 3391<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 15229<br />value: 3085<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 15252<br />value: 3133<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 15258<br />value: 3287<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 15280<br />value: 3602<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 15296<br />value: 3646<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 15313<br />value: 3620<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 15321<br />value: 3644<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 15335<br />value: 3707<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 15358<br />value: 3724<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 15371<br />value: 3937<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 15391<br />value: 4036<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 15405<br />value: 4296<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 15433<br />value: 4199<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 15448<br />value: 4083<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 15463<br />value: 4094<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 15475<br />value: 4022<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 15489<br />value: 3725<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 15505<br />value: 3579<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 15517<br />value: 3628<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 15532<br />value: 3665<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 15546<br />value: 3717<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 15559<br />value: 3891<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 15587<br />value: 3874<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 15615<br />value: 3993<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 15651<br />value: 4212<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 15678<br />value: 4479<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 15734<br />value: 4825<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 15770<br />value: 4873<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 15797<br />value: 4744<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 15832<br />value: 4802<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 15860<br />value: 4687<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 15888<br />value: 4653<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 15923<br />value: 4649<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 15951<br />value: 4640<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 15979<br />value: 4627<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16014<br />value: 4629<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16042<br />value: 4686<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16084<br />value: 4741<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16106<br />value: 4463<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16133<br />value: 4406<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16161<br />value: 4597<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16196<br />value: 4626<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16224<br />value: 4777<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16252<br />value: 4927<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16287<br />value: 4630<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16315<br />value: 4432<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16346<br />value: 4222<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16381<br />value: 3718<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16406<br />value: 3286<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16448<br />value: 2697<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16469<br />value: 2414<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16486<br />value: 2699<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16499<br />value: 2674<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16512<br />value: 2607<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16526<br />value: 2774<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16540<br />value: 3056<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16554<br />value: 3012<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16568<br />value: 3070<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16582<br />value: 3039<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16596<br />value: 2737<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16610<br />value: 2691<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16624<br />value: 2492<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16639<br />value: 2515<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16652<br />value: 2306<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16666<br />value: 2201<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16680<br />value: 2198<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16694<br />value: 2087<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16709<br />value: 2096<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16722<br />value: 2230<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16736<br />value: 2207<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16750<br />value: 2171<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16765<br />value: 2139<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16814<br />value: 1795<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16827<br />value: 1684<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16841<br />value: 1764<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16856<br />value: 1834<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16869<br />value: 1896<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16883<br />value: 1995<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16897<br />value: 1971<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16911<br />value: 2067<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16926<br />value: 1989<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16940<br />value: 2022<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16953<br />value: 2006<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16967<br />value: 1988<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16981<br />value: 2001<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 16995<br />value: 2021<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 17009<br />value: 1971<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 17023<br />value: 1990<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 17037<br />value: 2049<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 17065<br />value: 2061<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 17080<br />value: 2102<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 17100<br />value: 2100<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 17114<br />value: 2016<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 17128<br />value: 1960<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 17142<br />value: 1918<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 17157<br />value: 2000<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 17191<br />value: 2086<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 17205<br />value: 2120<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 17220<br />value: 2147<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 17255<br />value: 2203<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 17269<br />value: 2199<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)","data: 17284<br />value: 2187<br />variable: novostrojki(usd)<br />variable: novostrojki(usd)"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(124,181,236,1)","dash":"solid"},"hoveron":"points","name":"novostrojki(usd)","legendgroup":"novostrojki(usd)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1224633600000,1224633600000,1225843200000,1227052800000,1228262400000,1229472000000,1230681600000,1231891200000,1233014400000,1234224000000,1235433600000,1236729600000,1237939200000,1239148800000,1240272000000,1241740800000,1243296000000,1244505600000,1245628800000,1246924800000,1248134400000,1249257600000,1250640000000,1251676800000,1252972800000,1254182400000,1255392000000,1256601600000,1257811200000,1259020800000,1260230400000,1261440000000,1263859200000,1265068800000,1266364800000,1267488000000,1268697600000,1269907200000,1271116800000,1272326400000,1273622400000,1274832000000,1276041600000,1277251200000,1278460800000,1279497600000,1280880000000,1282608000000,1285027200000,1285804800000,1286841600000,1288051200000,1289260800000,1290470400000,1291766400000,1292803200000,1294704000000,1295913600000,1297123200000,1298332800000,1300752000000,1301875200000,1303171200000,1305590400000,1306800000000,1309219200000,1310428800000,1311724800000,1314057600000,1315785600000,1317772800000,1318291200000,1320192000000,1321574400000,1323043200000,1323734400000,1324944000000,1326931200000,1328054400000,1329782400000,1330992000000,1333411200000,1334707200000,1336003200000,1337040000000,1338249600000,1339632000000,1340668800000,1341964800000,1343174400000,1344297600000,1346716800000,1349136000000,1352246400000,1354579200000,1359417600000,1362528000000,1364860800000,1367884800000,1370304000000,1372723200000,1375747200000,1378166400000,1380585600000,1383609600000,1386028800000,1389657600000,1391558400000,1393891200000,1396310400000,1399334400000,1401753600000,1404172800000,1407196800000,1409616000000,1412294400000,1415318400000,1417478400000,1421107200000,1422921600000,1424390400000,1425513600000,1426636800000,1427846400000,1429056000000,1430265600000,1431475200000,1432684800000,1433894400000,1435104000000,1436313600000,1437609600000,1438732800000,1439942400000,1441152000000,1442361600000,1443657600000,1444780800000,1445990400000,1447200000000,1448496000000,1452729600000,1453852800000,1455062400000,1456358400000,1457481600000,1458691200000,1459900800000,1461110400000,1462406400000,1463616000000,1464739200000,1465948800000,1467158400000,1468368000000,1469577600000,1470787200000,1471996800000,1474416000000,1475712000000,1477440000000,1478649600000,1479859200000,1481068800000,1482364800000,1485302400000,1486512000000,1487808000000,1490832000000,1492041600000,1493337600000],"y":[4364,4745,4530,4594,4501,4340,4021,3743,3581,3265,3353,3284,3521,3304,3274,3317,3453,3407,3320,3664,3523,3444,3475,3476,3451,3515,3576,3682,3732,3731,3607,3468,3633,3464,3533,3569,3627,3566,3630,3570,3448,3273,3305,3363,3331,3482,3510,3432,3402,3459,3515,3467,3289,3351,3267,3514,3489,3551,3599,3588,3707,3693,3827,3909,3968,3892,3867,4018,3974,3826,3916,4041,4285,4271,4177,4269,4543,4497,4658,4839,4895,4775,4784,4851,4729,4473,4237,4474,4433,4554,4699,4753,4936,4918,5067,5234,5142,4926,4925,4576,4494,4635,4551,4803,4581,4598,4641,4341,4240,4358,4369,4545,4735,4491,4261,4049,3576,3129,2626,2382,2658,2674,2642,2775,3062,3023,3127,3156,2832,2874,2643,2652,2399,2285,2271,2184,2253,2373,2318,2282,2271,1895,1752,1842,1899,1976,2122,2089,2193,2217,2279,2193,2220,2267,2229,2164,2192,2220,2292,2360,2358,2277,2238,2161,2243,2364,2424,2584,2661,2688,2655],"text":["data: 14174<br />value: 4364<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14174<br />value: 4745<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14188<br />value: 4530<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14202<br />value: 4594<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14216<br />value: 4501<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14230<br />value: 4340<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14244<br />value: 4021<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14258<br />value: 3743<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14271<br />value: 3581<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14285<br />value: 3265<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14299<br />value: 3353<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14314<br />value: 3284<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14328<br />value: 3521<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14342<br />value: 3304<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14355<br />value: 3274<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14372<br />value: 3317<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14390<br />value: 3453<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14404<br />value: 3407<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14417<br />value: 3320<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14432<br />value: 3664<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14446<br />value: 3523<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14459<br />value: 3444<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14475<br />value: 3475<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14487<br />value: 3476<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14502<br />value: 3451<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14516<br />value: 3515<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14530<br />value: 3576<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14544<br />value: 3682<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14558<br />value: 3732<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14572<br />value: 3731<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14586<br />value: 3607<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14600<br />value: 3468<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14628<br />value: 3633<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14642<br />value: 3464<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14657<br />value: 3533<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14670<br />value: 3569<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14684<br />value: 3627<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14698<br />value: 3566<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14712<br />value: 3630<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14726<br />value: 3570<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14741<br />value: 3448<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14755<br />value: 3273<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14769<br />value: 3305<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14783<br />value: 3363<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14797<br />value: 3331<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14809<br />value: 3482<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14825<br />value: 3510<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14845<br />value: 3432<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14873<br />value: 3402<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14882<br />value: 3459<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14894<br />value: 3515<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14908<br />value: 3467<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14922<br />value: 3289<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14936<br />value: 3351<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14951<br />value: 3267<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14963<br />value: 3514<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14985<br />value: 3489<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 14999<br />value: 3551<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 15013<br />value: 3599<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 15027<br />value: 3588<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 15055<br />value: 3707<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 15068<br />value: 3693<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 15083<br />value: 3827<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 15111<br />value: 3909<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 15125<br />value: 3968<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 15153<br />value: 3892<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 15167<br />value: 3867<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 15182<br />value: 4018<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 15209<br />value: 3974<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 15229<br />value: 3826<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 15252<br />value: 3916<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 15258<br />value: 4041<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 15280<br />value: 4285<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 15296<br />value: 4271<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 15313<br />value: 4177<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 15321<br />value: 4269<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 15335<br />value: 4543<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 15358<br />value: 4497<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 15371<br />value: 4658<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 15391<br />value: 4839<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 15405<br />value: 4895<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 15433<br />value: 4775<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 15448<br />value: 4784<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 15463<br />value: 4851<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 15475<br />value: 4729<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 15489<br />value: 4473<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 15505<br />value: 4237<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 15517<br />value: 4474<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 15532<br />value: 4433<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 15546<br />value: 4554<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 15559<br />value: 4699<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 15587<br />value: 4753<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 15615<br />value: 4936<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 15651<br />value: 4918<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 15678<br />value: 5067<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 15734<br />value: 5234<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 15770<br />value: 5142<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 15797<br />value: 4926<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 15832<br />value: 4925<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 15860<br />value: 4576<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 15888<br />value: 4494<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 15923<br />value: 4635<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 15951<br />value: 4551<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 15979<br />value: 4803<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16014<br />value: 4581<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16042<br />value: 4598<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16084<br />value: 4641<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16106<br />value: 4341<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16133<br />value: 4240<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16161<br />value: 4358<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16196<br />value: 4369<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16224<br />value: 4545<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16252<br />value: 4735<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16287<br />value: 4491<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16315<br />value: 4261<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16346<br />value: 4049<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16381<br />value: 3576<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16406<br />value: 3129<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16448<br />value: 2626<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16469<br />value: 2382<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16486<br />value: 2658<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16499<br />value: 2674<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16512<br />value: 2642<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16526<br />value: 2775<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16540<br />value: 3062<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16554<br />value: 3023<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16568<br />value: 3127<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16582<br />value: 3156<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16596<br />value: 2832<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16610<br />value: 2874<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16624<br />value: 2643<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16639<br />value: 2652<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16652<br />value: 2399<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16666<br />value: 2285<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16680<br />value: 2271<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16694<br />value: 2184<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16709<br />value: 2253<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16722<br />value: 2373<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16736<br />value: 2318<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16750<br />value: 2282<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16765<br />value: 2271<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16814<br />value: 1895<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16827<br />value: 1752<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16841<br />value: 1842<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16856<br />value: 1899<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16869<br />value: 1976<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16883<br />value: 2122<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16897<br />value: 2089<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16911<br />value: 2193<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16926<br />value: 2217<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16940<br />value: 2279<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16953<br />value: 2193<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16967<br />value: 2220<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16981<br />value: 2267<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 16995<br />value: 2229<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 17009<br />value: 2164<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 17023<br />value: 2192<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 17037<br />value: 2220<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 17065<br />value: 2292<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 17080<br />value: 2360<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 17100<br />value: 2358<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 17114<br />value: 2277<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 17128<br />value: 2238<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 17142<br />value: 2161<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 17157<br />value: 2243<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 17191<br />value: 2364<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 17205<br />value: 2424<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 17220<br />value: 2584<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 17255<br />value: 2661<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 17269<br />value: 2688<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)","data: 17284<br />value: 2655<br />variable: vtoricnaa(usd)<br />variable: vtoricnaa(usd)"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(67,67,72,1)","dash":"solid"},"hoveron":"points","name":"vtoricnaa(usd)","legendgroup":"vtoricnaa(usd)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":26.2283105022831,"r":7.30593607305936,"b":40.1826484018265,"l":48.9497716894977},"plot_bgcolor":"rgba(235,235,235,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187},"xaxis":{"domain":[0,1],"type":"linear","autorange":false,"tickmode":"array","range":[1211198400000,1506772800000],"ticktext":["2010","2012","2014","2016"],"tickvals":[1262304000000,1325376000000,1388534400000,1451606400000],"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"y","title":"data","titlefont":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"type":"linear","autorange":false,"tickmode":"array","range":[1506.5,5411.5],"ticktext":["2000","3000","4000","5000"],"tickvals":[2000,3000,4000,5000],"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"x","title":"value","titlefont":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.88976377952756,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.689497716895},"y":0.913385826771654},"annotations":[{"text":"variable","x":1.02,"y":1,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"left","yanchor":"bottom","legendTitle":true}],"hovermode":"closest","width":504,"height":360},"source":"A","attrs":{"20c7432cd11c":{"x":{},"y":{},"colour":{},"type":"ggplotly"}},"cur_data":"20c7432cd11c","visdat":{"20c7432cd11c":["function (y) ","x"]},"config":{"modeBarButtonsToAdd":[{"name":"Collaborate","icon":{"width":1000,"ascent":500,"descent":-50,"path":"M487 375c7-10 9-23 5-36l-79-259c-3-12-11-23-22-31-11-8-22-12-35-12l-263 0c-15 0-29 5-43 15-13 10-23 23-28 37-5 13-5 25-1 37 0 0 0 3 1 7 1 5 1 8 1 11 0 2 0 4-1 6 0 3-1 5-1 6 1 2 2 4 3 6 1 2 2 4 4 6 2 3 4 5 5 7 5 7 9 16 13 26 4 10 7 19 9 26 0 2 0 5 0 9-1 4-1 6 0 8 0 2 2 5 4 8 3 3 5 5 5 7 4 6 8 15 12 26 4 11 7 19 7 26 1 1 0 4 0 9-1 4-1 7 0 8 1 2 3 5 6 8 4 4 6 6 6 7 4 5 8 13 13 24 4 11 7 20 7 28 1 1 0 4 0 7-1 3-1 6-1 7 0 2 1 4 3 6 1 1 3 4 5 6 2 3 3 5 5 6 1 2 3 5 4 9 2 3 3 7 5 10 1 3 2 6 4 10 2 4 4 7 6 9 2 3 4 5 7 7 3 2 7 3 11 3 3 0 8 0 13-1l0-1c7 2 12 2 14 2l218 0c14 0 25-5 32-16 8-10 10-23 6-37l-79-259c-7-22-13-37-20-43-7-7-19-10-37-10l-248 0c-5 0-9-2-11-5-2-3-2-7 0-12 4-13 18-20 41-20l264 0c5 0 10 2 16 5 5 3 8 6 10 11l85 282c2 5 2 10 2 17 7-3 13-7 17-13z m-304 0c-1-3-1-5 0-7 1-1 3-2 6-2l174 0c2 0 4 1 7 2 2 2 4 4 5 7l6 18c0 3 0 5-1 7-1 1-3 2-6 2l-173 0c-3 0-5-1-8-2-2-2-4-4-4-7z m-24-73c-1-3-1-5 0-7 2-2 3-2 6-2l174 0c2 0 5 0 7 2 3 2 4 4 5 7l6 18c1 2 0 5-1 6-1 2-3 3-5 3l-174 0c-3 0-5-1-7-3-3-1-4-4-5-6z"},"click":"function(gd) { \n        // is this being viewed in RStudio?\n        if (location.search == '?viewer_pane=1') {\n          alert('To learn about plotly for collaboration, visit:\\n https://cpsievert.github.io/plotly_book/plot-ly-for-collaboration.html');\n        } else {\n          window.open('https://cpsievert.github.io/plotly_book/plot-ly-for-collaboration.html', '_blank');\n        }\n      }"}],"cloud":false},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1}},"base_url":"https://plot.ly"},"evals":["config.modeBarButtonsToAdd.0.click"],"jsHooks":{"render":[{"code":"function(el, x) { var ctConfig = crosstalk.var('plotlyCrosstalkOpts').set({\"on\":\"plotly_click\",\"persistent\":false,\"dynamic\":false,\"selectize\":false,\"opacityDim\":0.2,\"selected\":{\"opacity\":1}}); }","data":null}]}}</script>
+</div>
+<div id="-" class="section level2">
+<h2>Определение выбросов</h2>
+<div id="-" class="section level3">
+<h3>Классификация выбросов</h3>
+<p>Five types of outliers can be considered.</p>
+<p>By default:</p>
+<ul>
+<li><p>“AO” additive outliers,</p></li>
+<li><p>“LS” level shifts,</p></li>
+<li><p>“TC” temporary changes are selected;</p></li>
+</ul>
+<p>Manualy you can add:</p>
+<p>“IO” innovative outliers and “SLS” seasonal level shifts can also be selected</p>
+<p>Futher info is here: <a href="https://jalobe.com/blog/tsoutliers/" class="uri">https://jalobe.com/blog/tsoutliers/</a></p>
+<pre><code>
+Call:
+structure(list(method = NULL), .Names = &quot;method&quot;)
+
+Coefficients:
+        ma1   sma1  TC81   AO93  TC96  TC104  LS130  LS158
+      -0.35  -0.35  5742  -4478  4445  -5166  -6207   4637
+s.e.    NaN    NaN  1148    887  1167   1148   1306   1314
+
+sigma^2 estimated as 2123675:  log likelihood = -1471,  aic = 2960
+
+Outliers:
+  type ind time coefhat tstat
+1   TC  81   81    5742  5.00
+2   AO  93   93   -4478 -5.05
+3   TC  96   96    4445  3.81
+4   TC 104  104   -5166 -4.50
+5   LS 130  130   -6207 -4.75
+6   LS 158  158    4637  3.53</code></pre>
+<p><img src="renovation_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<pre><code>           data       novostrojki novostrojki(usd) novostrojki(eur)
+2012-03-06 2012-03-06 125833      4296             3255            
+2012-10-02 2012-10-02 124788      3993             3108            
+2013-01-29 2013-01-29 145139      4825             3588            
+2013-10-01 2013-10-01 150295      4627             3430            
+2015-06-24 2015-06-24 145847      2691             2389            
+2016-08-24 2016-08-24 132733      2049             1807            
+           vtoricnaa vtoricnaa(usd) vtoricnaa(eur) elitnaanedvizimost
+2012-03-06 143368    4895           3709           240966            
+2012-10-02 154272    4936           3843           194111            
+2013-01-29 157440    5234           3892           209101            
+2013-10-01 156022    4803           3561           243211            
+2015-06-24 155770    2874           2551           242744            
+2016-08-24 143813    2220           1957           235449            
+           elitnaanedvizimost(usd) elitnaanedvizimost(eur) neft price 
+2012-03-06  8227                    6234                   122  134600
+2012-10-02  6211                    4835                   111  139530
+2013-01-29  6952                    5169                   114  151290
+2013-10-01  7487                    5551                   107  153158
+2015-06-24  4478                    3976                    64  150808
+2016-08-24  3635                    3205                   &lt;NA&gt; 138273</code></pre>
+<pre><code>           type ind time coefhat tstat       data novostrojki
+2012-03-06   TC  81   81    5742   5.0 2012-03-06      125833
+2012-10-02   AO  93   93   -4478  -5.0 2012-10-02      124788
+2013-01-29   TC  96   96    4445   3.8 2013-01-29      145139
+2013-10-01   TC 104  104   -5166  -4.5 2013-10-01      150295
+2015-06-24   LS 130  130   -6207  -4.8 2015-06-24      145847
+2016-08-24   LS 158  158    4637   3.5 2016-08-24      132733
+           novostrojki(usd) novostrojki(eur) vtoricnaa vtoricnaa(usd)
+2012-03-06             4296             3255    143368           4895
+2012-10-02             3993             3108    154272           4936
+2013-01-29             4825             3588    157440           5234
+2013-10-01             4627             3430    156022           4803
+2015-06-24             2691             2389    155770           2874
+2016-08-24             2049             1807    143813           2220
+           vtoricnaa(eur) elitnaanedvizimost elitnaanedvizimost(usd)
+2012-03-06           3709             240966                    8227
+2012-10-02           3843             194111                    6211
+2013-01-29           3892             209101                    6952
+2013-10-01           3561             243211                    7487
+2015-06-24           2551             242744                    4478
+2016-08-24           1957             235449                    3635
+           elitnaanedvizimost(eur) neft  price
+2012-03-06                    6234  122 134600
+2012-10-02                    4835  111 139530
+2013-01-29                    5169  114 151290
+2013-10-01                    5551  107 153158
+2015-06-24                    3976   64 150808
+2016-08-24                    3205 &lt;NA&gt; 138273</code></pre>
+<p><img src="renovation_files/figure-html/unnamed-chunk-12-2.png" width="672" /></p>
+</div>
+<div id="-" class="section level3">
+<h3>Оптимальное разбиение</h3>
+<pre><code>
+     Optimal 4-segment partition: 
+
+Call:
+breakpoints.formula(formula = dat.ts ~ 1)
+
+Breakpoints at observation number:
+70 95 129 
+
+Corresponding to breakdates:
+70 95 129 </code></pre>
+<p><img src="renovation_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+</div>
+<div id="----" class="section level3">
+<h3>График с событиями и ценами</h3>
+<pre><code>Using &#39;,&#39; as decimal and &#39;.&#39; as grouping mark. Use read_delim() for more control.</code></pre>
+<pre><code>Parsed with column specification:
+cols(
+  date = col_number(),
+  description = col_character(),
+  weigth = col_integer()
+)</code></pre>
+<pre><code>Don&#39;t know how to automatically pick scale for object of type labelled/integer. Defaulting to continuous.</code></pre>
+<p><img src="renovation_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<p>To bee continued</p>
+</div>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
