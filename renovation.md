@@ -34,14 +34,14 @@
 
 <https://stats.stackexchange.com/questions/131261/granger-causality-interpretation-using-r>
 
-    Input object size:   11272 bytes;    11 variables    172 observations
-    New object size:    16624 bytes;    11 variables    172 observations
+    Input object size:   11792 bytes;    11 variables    182 observations
+    New object size:    17144 bytes;    11 variables    182 observations
 
-    Input object size:   11272 bytes;    11 variables    172 observations
-    New object size:    16624 bytes;    11 variables    172 observations
+    Input object size:   11792 bytes;    11 variables    182 observations
+    New object size:    17144 bytes;    11 variables    182 observations
 
-    Input object size:   11272 bytes;    11 variables    172 observations
-    New object size:    16624 bytes;    11 variables    172 observations
+    Input object size:   11792 bytes;    11 variables    182 observations
+    New object size:    17144 bytes;    11 variables    182 observations
 
 Что у нас в данных?
 ===================
@@ -74,9 +74,9 @@
 <tr class="odd">
 <td align="center">8</td>
 <td align="center">74</td>
-<td align="center">67</td>
-<td align="center">17</td>
-<td align="center">6</td>
+<td align="center">73</td>
+<td align="center">19</td>
+<td align="center">8</td>
 <td align="center">0</td>
 <td align="center">0</td>
 </tr>
@@ -124,7 +124,7 @@
 <td align="center">12</td>
 <td align="center">23</td>
 <td align="center">24</td>
-<td align="center">7</td>
+<td align="center">17</td>
 </tr>
 </tbody>
 </table>
@@ -185,20 +185,21 @@ Futher info is here: <https://jalobe.com/blog/tsoutliers/>
     structure(list(method = NULL), .Names = "method")
 
     Coefficients:
-            ma1   sma1  TC81   AO93  TC96  TC104  LS130  LS158
-          -0.35  -0.35  5742  -4478  4445  -5166  -6207   4637
-    s.e.    NaN    NaN  1148    887  1167   1148   1306   1314
+            ma1   sma1  TC81   AO93  TC96  TC104  LS130  LS158  TC181
+          -0.36  -0.36  5747  -4512  4511  -5170  -6239   4693   5519
+    s.e.    NaN    NaN  1141    888  1159   1141   1295   1303   1248
 
-    sigma^2 estimated as 2123675:  log likelihood = -1471,  aic = 2960
+    sigma^2 estimated as 2068554:  log likelihood = -1564,  aic = 3149
 
     Outliers:
       type ind time coefhat tstat
-    1   TC  81   81    5742  5.00
-    2   AO  93   93   -4478 -5.05
-    3   TC  96   96    4445  3.81
-    4   TC 104  104   -5166 -4.50
-    5   LS 130  130   -6207 -4.75
-    6   LS 158  158    4637  3.53
+    1   TC  81   81    5747  5.04
+    2   AO  93   93   -4512 -5.08
+    3   TC  96   96    4511  3.89
+    4   TC 104  104   -5170 -4.53
+    5   LS 130  130   -6239 -4.82
+    6   LS 158  158    4693  3.60
+    7   TC 181  181    5519  4.42
 
 ![](renovation_files/figure-markdown_strict/unnamed-chunk-12-1.png)
 
@@ -209,6 +210,7 @@ Futher info is here: <https://jalobe.com/blog/tsoutliers/>
     2013-10-01 2013-10-01 150295      4627             3430            
     2015-06-24 2015-06-24 145847      2691             2389            
     2016-08-24 2016-08-24 132733      2049             1807            
+    2017-09-27 2017-09-27 131789      2291             1937            
                vtoricnaa vtoricnaa(usd) vtoricnaa(eur) elitnaanedvizimost
     2012-03-06 143368    4895           3709           240966            
     2012-10-02 154272    4936           3843           194111            
@@ -216,6 +218,7 @@ Futher info is here: <https://jalobe.com/blog/tsoutliers/>
     2013-10-01 156022    4803           3561           243211            
     2015-06-24 155770    2874           2551           242744            
     2016-08-24 143813    2220           1957           235449            
+    2017-09-27 150493    2616           2212           223662            
                elitnaanedvizimost(usd) elitnaanedvizimost(eur) neft price 
     2012-03-06  8227                    6234                   122  134600
     2012-10-02  6211                    4835                   111  139530
@@ -223,14 +226,16 @@ Futher info is here: <https://jalobe.com/blog/tsoutliers/>
     2013-10-01  7487                    5551                   107  153158
     2015-06-24  4478                    3976                    64  150808
     2016-08-24  3635                    3205                   <NA> 138273
+    2017-09-27  3889                    3288                   <NA> 141141
 
                type ind time coefhat tstat       data novostrojki
-    2012-03-06   TC  81   81    5742   5.0 2012-03-06      125833
-    2012-10-02   AO  93   93   -4478  -5.0 2012-10-02      124788
-    2013-01-29   TC  96   96    4445   3.8 2013-01-29      145139
-    2013-10-01   TC 104  104   -5166  -4.5 2013-10-01      150295
-    2015-06-24   LS 130  130   -6207  -4.8 2015-06-24      145847
-    2016-08-24   LS 158  158    4637   3.5 2016-08-24      132733
+    2012-03-06   TC  81   81    5747   5.0 2012-03-06      125833
+    2012-10-02   AO  93   93   -4512  -5.1 2012-10-02      124788
+    2013-01-29   TC  96   96    4511   3.9 2013-01-29      145139
+    2013-10-01   TC 104  104   -5170  -4.5 2013-10-01      150295
+    2015-06-24   LS 130  130   -6239  -4.8 2015-06-24      145847
+    2016-08-24   LS 158  158    4693   3.6 2016-08-24      132733
+    2017-09-27   TC 181  181    5519   4.4 2017-09-27      131789
                novostrojki(usd) novostrojki(eur) vtoricnaa vtoricnaa(usd)
     2012-03-06             4296             3255    143368           4895
     2012-10-02             3993             3108    154272           4936
@@ -238,6 +243,7 @@ Futher info is here: <https://jalobe.com/blog/tsoutliers/>
     2013-10-01             4627             3430    156022           4803
     2015-06-24             2691             2389    155770           2874
     2016-08-24             2049             1807    143813           2220
+    2017-09-27             2291             1937    150493           2616
                vtoricnaa(eur) elitnaanedvizimost elitnaanedvizimost(usd)
     2012-03-06           3709             240966                    8227
     2012-10-02           3843             194111                    6211
@@ -245,6 +251,7 @@ Futher info is here: <https://jalobe.com/blog/tsoutliers/>
     2013-10-01           3561             243211                    7487
     2015-06-24           2551             242744                    4478
     2016-08-24           1957             235449                    3635
+    2017-09-27           2212             223662                    3889
                elitnaanedvizimost(eur) neft  price
     2012-03-06                    6234  122 134600
     2012-10-02                    4835  111 139530
@@ -252,22 +259,23 @@ Futher info is here: <https://jalobe.com/blog/tsoutliers/>
     2013-10-01                    5551  107 153158
     2015-06-24                    3976   64 150808
     2016-08-24                    3205 <NA> 138273
+    2017-09-27                    3288 <NA> 141141
 
 ![](renovation_files/figure-markdown_strict/unnamed-chunk-12-2.png)
 
 ### Оптимальное разбиение
 
 
-         Optimal 4-segment partition: 
+         Optimal 5-segment partition: 
 
     Call:
     breakpoints.formula(formula = dat.ts ~ 1)
 
     Breakpoints at observation number:
-    70 95 129 
+    68 95 128 155 
 
     Corresponding to breakdates:
-    70 95 129 
+    68 95 128 155 
 
 ![](renovation_files/figure-markdown_strict/unnamed-chunk-14-1.png)
 

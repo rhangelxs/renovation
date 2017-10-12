@@ -63,7 +63,6 @@ https://stats.stackexchange.com/questions/131261/granger-causality-interpretatio
 
 # Based on https://stackoverflow.com/questions/29348573/which-selector-to-write-in-rvest-package-in-r
 
-install.packages("rvest")
 library(rvest)
 url <- "http://www.restate.ru/graph/?id=1&sh=1&d=2&r1=1&o%5B%5D=1&o%5B%5D=2&curs%5B%5D=&curs%5B%5D=usd&curs%5B%5D=eur&period=1&relation=oil#gr1"
 
@@ -141,10 +140,9 @@ moscow_filename <- "./data/raw_html/moscow.html"
 spb_url <- "http://www.restate.ru/graph/?id=1&sh=1&d=2&r1=1&o%5B%5D=1&o%5B%5D=2&o%5B%5D=3&curs%5B%5D=&curs%5B%5D=usd&curs%5B%5D=eur&period=1&relation=oil#gr1"
 spb_filename <- "./data/raw_html/spb.html"
 
-if (!file.exists(spb_filename)) write(save_url(spb_url), file = spb_filename)
+if (!file.exists(spb_filename)) save_url(moscow_url, file_name = spb_filename)
 
-
-if (!file.exists(moscow_filename)) write(save_url(moscow_url), file = moscow_filename)
+if (!file.exists(moscow_filename)) save_url(moscow_url, file_name = moscow_filename)
 
 ```
 
